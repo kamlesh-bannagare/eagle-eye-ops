@@ -1,5 +1,6 @@
 import { useDroneStore } from '@/store/droneStore';
 import { Wifi, WifiOff, Battery, Clock, AlertTriangle, Radio, Server } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 function formatFlightTime(startTime: Date) {
   const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
