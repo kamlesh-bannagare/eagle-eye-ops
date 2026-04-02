@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { Shield, AlertTriangle } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function Login() {
   const [username, setUsername] = useState('');
