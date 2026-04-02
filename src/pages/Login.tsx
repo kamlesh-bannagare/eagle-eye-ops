@@ -38,13 +38,17 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-primary/10 border border-primary/30 mb-4">
-            <Shield className="w-8 h-8 text-primary" />
+            <img
+              src="/SenseGiz.jpg"
+              alt="Brand Logo"
+              className="w-10 h-10 object-contain"
+            />
           </div>
           <h1 className="text-xl font-semibold text-foreground font-mono tracking-wider">
-            TRAKKACAM TC-300
+            SenseGiz
           </h1>
           <p className="text-xs text-muted-foreground mt-1 font-mono uppercase tracking-widest">
-            Ground Control Station
+            Drone Tracking System
           </p>
         </div>
 

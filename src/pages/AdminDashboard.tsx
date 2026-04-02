@@ -49,7 +49,11 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="h-12 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
         <div className="flex items-center gap-3">
-          <Shield className="w-5 h-5 text-primary" />
+          <img
+            src="/SenseGiz.jpg"
+            alt="Brand Logo"
+            className="w-10 h-10 object-contain"
+          />
           <span className="font-mono text-sm font-semibold text-foreground tracking-wider">
             ADMIN CONSOLE
           </span>
@@ -159,9 +163,8 @@ export default function AdminDashboard() {
                       <td className="px-4 py-2.5 text-foreground">{user.name}</td>
                       <td className="px-4 py-2.5 text-muted-foreground">{user.username}</td>
                       <td className="px-4 py-2.5">
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase ${
-                          user.role === 'admin' ? 'bg-primary/15 text-primary' : 'bg-accent/15 text-accent'
-                        }`}>
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase ${user.role === 'admin' ? 'bg-primary/15 text-primary' : 'bg-accent/15 text-accent'
+                          }`}>
                           {user.role}
                         </span>
                       </td>

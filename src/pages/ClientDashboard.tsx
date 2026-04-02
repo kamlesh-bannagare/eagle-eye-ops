@@ -37,7 +37,11 @@ export default function ClientDashboard() {
       {/* Header */}
       <div className="h-12 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
         <div className="flex items-center gap-3">
-          <Shield className="w-5 h-5 text-primary" />
+          <img
+              src="/SenseGiz.jpg"
+              alt="Brand Logo"
+              className="w-10 h-10 object-contain"
+            />
           <span className="font-mono text-sm font-semibold text-foreground tracking-wider">
             MISSION OVERVIEW
           </span>
