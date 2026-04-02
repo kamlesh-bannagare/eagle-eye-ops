@@ -3,7 +3,7 @@ import { TargetOverlay } from './TargetOverlay';
 import { CameraModeSwitcher } from './CameraModeSwitcher';
 
 function FeedCanvas({ mode, className = '' }: { mode: 'EO' | 'IR'; className?: string }) {
-  const { targets, selectedTargetId, selectTarget, zoom, pan, tilt } = useDroneStore();
+  const { trackingEvents, targetIntelligence, selectedTargetId, selectTarget, telemetry } = useDroneStore();
 
   const bgClass = mode === 'IR'
     ? 'bg-gradient-to-br from-[#1a0a2e] via-[#0d1117] to-[#1a1a2e]'
@@ -46,30 +46,34 @@ function FeedCanvas({ mode, className = '' }: { mode: 'EO' | 'IR'; className?: s
       {/* Camera info */}
       <div className="absolute top-3 right-3 text-right">
         <div className="font-mono text-[9px] text-muted-foreground/70 space-y-0.5">
-          <div>PAN {pan.toFixed(1)}° TILT {tilt.toFixed(1)}°</div>
-          <div>ZOOM {zoom.toFixed(1)}x</div>
+          <div>AZ {telemetry.position.azimuth.toFixed(2)}° EL {telemetry.position.elevation.toFixed(2)}°</div>
+          <div>ZOOM {telemetry.sensors.zoom}x FOCUS {(telemetry.sensors.focus * 100).toFixed(0)}%</div>
           <div>REC ● {new Date().toISOString().slice(11, 19)}</div>
         </div>
       </div>
 
-      {/* Targets */}
-      {targets.map((target) => (
-        <TargetOverlay
-          key={target.id}
-          target={target}
-          selected={target.id === selectedTargetId}
-          onClick={() => selectTarget(target.id)}
-          isIR={mode === 'IR'}
-        />
-      ))}
+      {/* Targets from tracking events */}
+      {trackingEvents.map((te) => {
+        const intel = targetIntelligence.find(ti => ti.target_id === te.target_id);
+        return (
+          <TargetOverlay
+            key={te._id}
+            trackingEvent={te}
+            intel={intel || null}
+            selected={te.target_id === selectedTargetId}
+            onClick={() => selectTarget(te.target_id)}
+            isIR={mode === 'IR'}
+          />
+        );
+      })}
 
       {/* Bottom info bar */}
       <div className="absolute bottom-0 left-0 right-0 bg-background/60 backdrop-blur-sm px-3 py-1 flex items-center justify-between">
         <span className="font-mono text-[9px] text-muted-foreground">
-          LAT {(33.9425).toFixed(4)} LON {(-118.4081).toFixed(4)}
+          LAT {telemetry.geo.lat.toFixed(4)} LON {telemetry.geo.lon.toFixed(4)} ALT {Math.round(telemetry.geo.altitude)}m
         </span>
         <span className="font-mono text-[9px] text-tactical-green">
-          {targets.filter(t => t.tracked).length} TRACKED
+          {trackingEvents.length} TRACKED
         </span>
       </div>
     </div>

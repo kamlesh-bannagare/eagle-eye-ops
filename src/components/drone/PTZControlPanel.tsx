@@ -3,7 +3,24 @@ import { PanelHeader } from './PanelHeader';
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 
 export function PTZControlPanel() {
-  const { pan, tilt, zoom, focus, setPan, setTilt, setZoom, setFocus } = useDroneStore();
+  const { telemetry, sendCommand } = useDroneStore();
+  const { sensors, position } = telemetry;
+
+  const adjustAzimuth = (delta: number) => {
+    sendCommand('GIMBAL', 'SET_RATE_AZ', { value: delta });
+  };
+  const adjustElevation = (delta: number) => {
+    sendCommand('GIMBAL', 'SET_RATE_EL', { value: delta });
+  };
+  const setZoom = (value: number) => {
+    sendCommand('CAMERA', 'SET_ZOOM', { value });
+  };
+  const setFocus = (value: number) => {
+    sendCommand('CAMERA', 'SET_FOCUS', { value });
+  };
+  const setExposure = (value: number) => {
+    sendCommand('CAMERA', 'SET_EXPOSURE', { value });
+  };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -11,56 +28,80 @@ export function PTZControlPanel() {
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
         {/* PTZ Joystick */}
         <div>
-          <div className="text-[9px] font-mono text-muted-foreground tracking-widest mb-2">PAN / TILT</div>
+          <div className="text-[9px] font-mono text-muted-foreground tracking-widest mb-2">GIMBAL</div>
           <div className="flex flex-col items-center gap-1">
-            <PTZButton icon={ChevronUp} onClick={() => setTilt(tilt + 5)} />
+            <PTZButton icon={ChevronUp} onClick={() => adjustElevation(0.05)} />
             <div className="flex items-center gap-1">
-              <PTZButton icon={ChevronLeft} onClick={() => setPan(pan - 5)} />
+              <PTZButton icon={ChevronLeft} onClick={() => adjustAzimuth(-0.05)} />
               <button
-                onClick={() => { setPan(0); setTilt(-15); }}
+                onClick={() => { sendCommand('GIMBAL', 'RESET', {}); }}
                 className="w-8 h-8 flex items-center justify-center border border-border rounded-sm bg-muted/50 hover:bg-muted transition-colors"
               >
                 <RotateCcw className="w-3 h-3 text-muted-foreground" />
               </button>
-              <PTZButton icon={ChevronRight} onClick={() => setPan(pan + 5)} />
+              <PTZButton icon={ChevronRight} onClick={() => adjustAzimuth(0.05)} />
             </div>
-            <PTZButton icon={ChevronDown} onClick={() => setTilt(tilt - 5)} />
+            <PTZButton icon={ChevronDown} onClick={() => adjustElevation(-0.05)} />
           </div>
           <div className="mt-2 text-center font-mono text-[9px] text-muted-foreground">
-            P: {pan.toFixed(1)}° T: {tilt.toFixed(1)}°
+            AZ: {position.azimuth.toFixed(3)}° EL: {position.elevation.toFixed(3)}°
           </div>
         </div>
 
         {/* Zoom */}
         <SliderControl
           label="ZOOM"
-          value={zoom}
+          value={sensors.zoom}
           min={1}
           max={30}
           step={0.5}
           onChange={setZoom}
-          displayValue={`${zoom.toFixed(1)}x`}
+          displayValue={`${sensors.zoom.toFixed(1)}x`}
         />
 
         {/* Focus */}
         <SliderControl
           label="FOCUS"
-          value={focus}
+          value={sensors.focus}
           min={0}
-          max={100}
-          step={1}
+          max={1}
+          step={0.01}
           onChange={setFocus}
-          displayValue={`${Math.round(focus)}%`}
+          displayValue={`${(sensors.focus * 100).toFixed(0)}%`}
+        />
+
+        {/* Exposure */}
+        <SliderControl
+          label="EXPOSURE"
+          value={sensors.exposure}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={setExposure}
+          displayValue={`${(sensors.exposure * 100).toFixed(0)}%`}
         />
 
         {/* Quick actions */}
         <div>
           <div className="text-[9px] font-mono text-muted-foreground tracking-widest mb-2">QUICK ACTIONS</div>
           <div className="grid grid-cols-2 gap-1">
-            <QuickAction label="AUTO FOCUS" onClick={() => setFocus(85)} />
-            <QuickAction label="RESET PTZ" onClick={() => { setPan(0); setTilt(-15); setZoom(1); }} />
+            <QuickAction label="AUTO FOCUS" onClick={() => setFocus(0.85)} />
+            <QuickAction label="RESET GIMBAL" onClick={() => sendCommand('GIMBAL', 'RESET', {})} />
             <QuickAction label="ZOOM 10x" onClick={() => setZoom(10)} />
             <QuickAction label="ZOOM 20x" onClick={() => setZoom(20)} />
+          </div>
+        </div>
+
+        {/* Raw channels */}
+        <div>
+          <div className="text-[9px] font-mono text-muted-foreground tracking-widest mb-2">RAW CHANNELS</div>
+          <div className="space-y-1">
+            {telemetry.raw_channels.map(ch => (
+              <div key={ch.channel} className="flex items-center justify-between">
+                <span className="font-mono text-[10px] text-muted-foreground">CH{ch.channel}</span>
+                <span className="font-mono text-[11px] text-foreground font-medium">{ch.value.toFixed(3)}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
