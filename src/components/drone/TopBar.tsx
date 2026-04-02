@@ -73,6 +73,8 @@ export function TopBar() {
           </span>
         </div>
 
+        <ThemeToggle />
+
         <span className="font-mono text-[10px] text-muted-foreground">
           {new Date().toISOString().slice(11, 19)}Z
         </span>

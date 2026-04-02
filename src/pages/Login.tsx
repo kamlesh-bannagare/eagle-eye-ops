@@ -30,7 +30,10 @@ export default function Login() {
   };
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center bg-background">
+    <div className="h-screen w-screen flex items-center justify-center bg-background relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">

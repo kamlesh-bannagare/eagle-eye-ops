@@ -49,6 +49,7 @@ export default function ClientDashboard() {
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs font-mono text-muted-foreground">{currentUser.name}</span>
+          <ThemeToggle />
           <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground transition-colors">
             <LogOut className="w-4 h-4" />
           </button>
