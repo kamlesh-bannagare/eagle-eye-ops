@@ -1,30 +1,66 @@
 import { useDroneStore } from '@/store/droneStore';
 import { PanelHeader } from './PanelHeader';
 import {
-  Navigation, Gauge, Mountain, Compass, MapPin, Crosshair, Target,
+  Crosshair, Target, Mountain, Compass, MapPin, Shield, Eye, Activity,
 } from 'lucide-react';
+
+const threatColors: Record<string, string> = {
+  critical: 'text-tactical-red',
+  high: 'text-tactical-red',
+  medium: 'text-tactical-amber',
+  low: 'text-tactical-green',
+};
+
+const classColors: Record<string, string> = {
+  hostile: 'text-tactical-red',
+  unknown: 'text-tactical-amber',
+  neutral: 'text-muted-foreground',
+  friendly: 'text-tactical-green',
+};
 
 export function DroneStatusPanel() {
   const {
-    altitude, speed, heading, batteryLevel, gpsLat, gpsLng,
-    targets, selectedTargetId, selectTarget, trackingMode, setTrackingMode,
+    device, telemetry, trackingEvents, targetIntelligence,
+    selectedTargetId, selectTarget, trackingMode, setTrackingMode,
+    missions,
   } = useDroneStore();
 
-  const selectedTarget = targets.find(t => t.id === selectedTargetId);
+  const activeMission = missions.find(m => m.status === 'active');
+  const selectedIntel = targetIntelligence.find(t => t.target_id === selectedTargetId);
+  const selectedTrack = trackingEvents.find(t => t.target_id === selectedTargetId);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <PanelHeader title="DRONE STATUS" status="active" />
+      <PanelHeader title="STATUS" status={device.status === 'active' ? 'active' : 'error'} />
 
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
+        {/* Device */}
+        <Section title="DEVICE">
+          <DataRow icon={Activity} label="ID" value={device.device_id} />
+          <DataRow icon={Shield} label="MODEL" value={device.model} />
+          <DataRow icon={Activity} label="FW" value={`v${device.firmware_version}`} />
+          <DataRow icon={Activity} label="IP" value={device.ip_address} />
+        </Section>
+
         {/* Telemetry */}
         <Section title="TELEMETRY">
-          <DataRow icon={Mountain} label="ALT" value={`${Math.round(altitude)} ft`} />
-          <DataRow icon={Gauge} label="SPD" value={`${Math.round(speed)} kts`} />
-          <DataRow icon={Compass} label="HDG" value={`${Math.round(heading)}°`} />
-          <DataRow icon={Navigation} label="TRK" value={`${Math.round(heading + 3)}°`} />
-          <DataRow icon={MapPin} label="POS" value={`${gpsLat.toFixed(4)}, ${gpsLng.toFixed(4)}`} />
+          <DataRow icon={Mountain} label="ALT" value={`${Math.round(telemetry.geo.altitude)} m`} />
+          <DataRow icon={Compass} label="AZ" value={`${telemetry.position.azimuth.toFixed(3)}°`} />
+          <DataRow icon={Compass} label="EL" value={`${telemetry.position.elevation.toFixed(3)}°`} />
+          <DataRow icon={MapPin} label="POS" value={`${telemetry.geo.lat.toFixed(4)}, ${telemetry.geo.lon.toFixed(4)}`} />
         </Section>
+
+        {/* Active Mission */}
+        {activeMission && (
+          <Section title="MISSION">
+            <DataRow icon={Shield} label="ID" value={activeMission.mission_id} />
+            <DataRow icon={MapPin} label="REGION" value={activeMission.region} />
+            <div className="flex justify-between font-mono text-[10px]">
+              <span className="text-muted-foreground">STATUS</span>
+              <span className="text-tactical-green uppercase">{activeMission.status}</span>
+            </div>
+          </Section>
+        )}
 
         {/* Tracking Mode */}
         <Section title="TRACKING MODE">
@@ -48,51 +84,70 @@ export function DroneStatusPanel() {
         {/* Target List */}
         <Section title="TARGETS">
           <div className="space-y-1">
-            {targets.map(t => (
-              <button
-                key={t.id}
-                onClick={() => selectTarget(t.id)}
-                className={`w-full flex items-center justify-between px-2 py-1.5 text-left border transition-colors ${
-                  t.id === selectedTargetId
-                    ? 'border-primary bg-primary/10'
-                    : 'border-transparent hover:border-border hover:bg-muted/50'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  {t.tracked ? (
-                    <Crosshair className="w-3 h-3 text-tactical-green" />
-                  ) : (
-                    <Target className="w-3 h-3 text-muted-foreground" />
-                  )}
-                  <span className="font-mono text-[10px] text-foreground">{t.id}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[9px] text-muted-foreground">{t.label}</span>
-                  <span className={`font-mono text-[9px] ${t.confidence > 85 ? 'text-tactical-green' : 'text-tactical-amber'}`}>
-                    {t.confidence}%
-                  </span>
-                </div>
-              </button>
-            ))}
+            {targetIntelligence.map(intel => {
+              const track = trackingEvents.find(t => t.target_id === intel.target_id);
+              return (
+                <button
+                  key={intel.target_id}
+                  onClick={() => selectTarget(intel.target_id)}
+                  className={`w-full flex items-center justify-between px-2 py-1.5 text-left border transition-colors ${
+                    intel.target_id === selectedTargetId
+                      ? 'border-primary bg-primary/10'
+                      : 'border-transparent hover:border-border hover:bg-muted/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {intel.classification === 'hostile' ? (
+                      <Crosshair className="w-3 h-3 text-tactical-red" />
+                    ) : (
+                      <Target className="w-3 h-3 text-muted-foreground" />
+                    )}
+                    <span className="font-mono text-[10px] text-foreground">{intel.target_id}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-mono text-[9px] uppercase ${classColors[intel.classification] || 'text-muted-foreground'}`}>
+                      {intel.classification}
+                    </span>
+                    <span className={`font-mono text-[9px] ${track && track.confidence > 0.85 ? 'text-tactical-green' : 'text-tactical-amber'}`}>
+                      {track ? `${Math.round(track.confidence * 100)}%` : '--'}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </Section>
 
         {/* Selected target detail */}
-        {selectedTarget && (
-          <Section title="TARGET DETAIL">
-            <DataRow icon={Target} label="ID" value={selectedTarget.id} />
+        {selectedIntel && (
+          <Section title="TARGET INTEL">
+            <DataRow icon={Target} label="ID" value={selectedIntel.target_id} />
             <div className="flex justify-between font-mono text-[10px]">
               <span className="text-muted-foreground">CLASS</span>
-              <span className="text-foreground">{selectedTarget.label}</span>
+              <span className={`uppercase ${classColors[selectedIntel.classification]}`}>{selectedIntel.classification}</span>
             </div>
             <div className="flex justify-between font-mono text-[10px]">
-              <span className="text-muted-foreground">CONF</span>
-              <span className="text-tactical-green">{selectedTarget.confidence}%</span>
+              <span className="text-muted-foreground">THREAT</span>
+              <span className={`uppercase ${threatColors[selectedIntel.threat_level]}`}>{selectedIntel.threat_level}</span>
             </div>
             <div className="flex justify-between font-mono text-[10px]">
-              <span className="text-muted-foreground">POS</span>
-              <span className="text-foreground">X:{selectedTarget.x.toFixed(1)} Y:{selectedTarget.y.toFixed(1)}</span>
+              <span className="text-muted-foreground">PATTERN</span>
+              <span className="text-foreground uppercase">{selectedIntel.movement_pattern}</span>
             </div>
+            {selectedTrack && (
+              <>
+                <div className="flex justify-between font-mono text-[10px]">
+                  <span className="text-muted-foreground">CONF</span>
+                  <span className="text-tactical-green">{Math.round(selectedTrack.confidence * 100)}%</span>
+                </div>
+                <div className="flex justify-between font-mono text-[10px]">
+                  <span className="text-muted-foreground">BBOX</span>
+                  <span className="text-foreground">
+                    {selectedTrack.bbox.x},{selectedTrack.bbox.y} {selectedTrack.bbox.w}×{selectedTrack.bbox.h}
+                  </span>
+                </div>
+              </>
+            )}
           </Section>
         )}
       </div>
