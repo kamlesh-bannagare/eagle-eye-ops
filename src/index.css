@@ -6,6 +6,72 @@
 
 @layer base {
   :root {
+    --background: 210 20% 96%;
+    --foreground: 220 20% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+
+    --primary: 160 100% 32%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 15% 90%;
+    --secondary-foreground: 220 15% 30%;
+
+    --muted: 210 15% 92%;
+    --muted-foreground: 220 10% 45%;
+
+    --accent: 185 70% 38%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 220 20% 7%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 210 15% 85%;
+    --input: 210 15% 85%;
+    --ring: 160 100% 32%;
+
+    --radius: 0.375rem;
+
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --font-sans: 'Inter', system-ui, sans-serif;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 20% 15%;
+    --sidebar-primary: 160 100% 32%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 15% 92%;
+    --sidebar-accent-foreground: 220 20% 15%;
+    --sidebar-border: 210 15% 85%;
+    --sidebar-ring: 160 100% 32%;
+
+    /* Tactical colors */
+    --tactical-green: 160 100% 32%;
+    --tactical-cyan: 185 70% 38%;
+    --tactical-amber: 38 92% 45%;
+    --tactical-red: 0 72% 51%;
+    --tactical-blue: 210 100% 50%;
+
+    /* Feed overlay */
+    --feed-bg: 210 15% 92%;
+    --feed-grid: 160 100% 32%;
+    --feed-crosshair: 160 100% 32%;
+
+    /* Panel */
+    --panel-header: 210 15% 95%;
+    --panel-border: 210 15% 85%;
+  }
+
+  .dark {
     --background: 220 20% 7%;
     --foreground: 200 20% 85%;
 
@@ -39,11 +105,6 @@
     --border: 220 15% 18%;
     --input: 220 15% 18%;
     --ring: 160 100% 40%;
-
-    --radius: 0.375rem;
-
-    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-    --font-sans: 'Inter', system-ui, sans-serif;
 
     --sidebar-background: 220 18% 8%;
     --sidebar-foreground: 200 20% 85%;

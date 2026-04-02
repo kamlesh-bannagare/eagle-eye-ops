@@ -1,5 +1,6 @@
 import { useDroneStore } from '@/store/droneStore';
 import { Wifi, WifiOff, Battery, Clock, AlertTriangle, Radio, Server } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 function formatFlightTime(startTime: Date) {
   const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
@@ -71,6 +72,8 @@ export function TopBar() {
             {(networkSession.packet_loss * 100).toFixed(1)}% loss
           </span>
         </div>
+
+        <ThemeToggle />
 
         <span className="font-mono text-[10px] text-muted-foreground">
           {new Date().toISOString().slice(11, 19)}Z

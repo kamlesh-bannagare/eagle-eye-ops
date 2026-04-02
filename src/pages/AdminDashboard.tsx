@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuthStore, UserRole } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { Shield, LogOut, UserPlus, Users, Power, Trash2, AlertTriangle } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function AdminDashboard() {
   const { currentUser, users, logout, createUser, toggleUserEnabled, deleteUser } = useAuthStore();
@@ -55,6 +56,7 @@ export default function AdminDashboard() {
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs font-mono text-muted-foreground">{currentUser.name}</span>
+          <ThemeToggle />
           <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground transition-colors">
             <LogOut className="w-4 h-4" />
           </button>

@@ -2,6 +2,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { useDroneStore } from '@/store/droneStore';
 import { Shield, LogOut, Radio, Gauge, MapPin, Eye, AlertTriangle, Activity, Target, Server } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function ClientDashboard() {
   const { currentUser, logout } = useAuthStore();
@@ -48,6 +49,7 @@ export default function ClientDashboard() {
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs font-mono text-muted-foreground">{currentUser.name}</span>
+          <ThemeToggle />
           <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground transition-colors">
             <LogOut className="w-4 h-4" />
           </button>
