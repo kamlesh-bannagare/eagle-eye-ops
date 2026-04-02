@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuthStore, UserRole } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { Shield, LogOut, UserPlus, Users, Power, Trash2, AlertTriangle } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function AdminDashboard() {
   const { currentUser, users, logout, createUser, toggleUserEnabled, deleteUser } = useAuthStore();
